@@ -41,22 +41,17 @@ ress = reco_result(img)
 
 
 # 识别结果传到Onenet
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# upload result to onenet
+url = "http://api.heclouds.com/devices/983835035/datapoints"
+APIKEY = "YOo6Lq7ZTxpdIR5lsvl4I=7AtI8="
 
-client.connect(("api.heclouds.com",80))
+dict = {"datastreams":[{"id":"item_tag","datapoints":[{"value":50}]}]}
+dict['datastreams'][0]['id'] = "item_tag"
+dict['datastreams'][0]['datapoints'][0]['value'] = ress
 
-head = f'''
-POST /bindata?device_id=983835035&datastream_item_tag HTTP/1.1
-HOST: api.heclouds.com
-api-key:y8CKgPcEm1y5HST3uPuA5eZld9I=
-Content-length:{len(ress)}
-
-'''
-# send labels_result
-client.send(head.encode())
-client.send(ress)
-res = client.recv(1024)
-
-client.close()
-
-
+s = json.dumps(dict)
+headers = {
+                "api-key":APIKEY,
+           }
+r = urequests.post(url,headers=headers,data = s)
+print(r.content)
